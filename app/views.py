@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
+from django.views.decorators.cache import cache_page
 
 from app.models import User
 from app.forms import CommentForm, ArticleForm, ProfileForm
@@ -12,6 +13,7 @@ from app.forms import CommentForm, ArticleForm, ProfileForm
 
 # Create your views here.
 
+@cache_page(60)
 def index(request):
     return render(request, 'account/index.html')
 
