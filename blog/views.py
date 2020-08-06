@@ -1,10 +1,12 @@
 from django.core.paginator import Paginator
+from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django_redis import get_redis_connection
 from django.db.models import Q
 from django.views.decorators.clickjacking import xframe_options_exempt, xframe_options_sameorigin
+from django.views.decorators.cache import cache_page
 
 from app.models import User, Collect
 from app.views import check_user
@@ -17,16 +19,24 @@ from app.forms import CommentForm, ArticleForm
 
 
 # 进入博客首页
+# @cache_page(60*15)
 def start_now(request):
-    blogs = Article.objects.all().order_by('-created_time')
+    if request.GET.get('action') == 'views':
+        blogs = Article.objects.all().order_by('-views')
+        action = 'views'
+    else:
+        blogs = Article.objects.all().order_by('-created_time')
+        action = 'normal'
     paginator = Paginator(blogs, 3)  # 每页5条数据
     page = request.GET.get('page', 1)  # 默认跳转到第一页
     result = paginator.page(page)
-    print('=================================')
     state = request.session.get('IS_LOGIN', '')
-    u_id = request.session.get('id', '')
-    user = User.objects.get(id=u_id)
-    return render(request, 'blog/blog_index.html', {"blogs": result, 'state':state, 'user': user})
+    if state:
+        u_id = request.session.get('id', '')
+        user = User.objects.get(id=u_id)
+        return render(request, 'blog/blog_index.html', {"blogs": result, 'state':state, 'user': user, 'action': action})
+    else:
+        return render(request, 'blog/blog_index.html', {"blogs": result, 'state': state, 'action': action})
 
 
 # 博客详情
@@ -37,6 +47,7 @@ def blog_detail(request, blog_id):
     blog = Article.objects.get(id=blog_id)
     # 更改浏览量
     blog.viewed()
+
     # 添加浏览记录
     connect = get_redis_connection('default')
     history_key = 'history_%d'%(u_id)
@@ -50,6 +61,9 @@ def blog_detail(request, blog_id):
     comment_list = blog.articlecomment_set.all()
     # 获取该用户的所有收藏博客
     collect_list = user.collected_article.all()
+    # 清除缓存
+    cache.delete('history_data')
+
     collect_id = []
     has_fav = 0
     for x in collect_list:
@@ -231,22 +245,29 @@ def search(request):
 # 获取浏览记录
 @check_user
 def getHistory(request):
-    u_id = request.session.get('id', '')
-    user = User.objects.get(id=u_id)
-    connect = get_redis_connection('default')
-    history_key = 'history_%d'%(u_id)
-    # 获取最新的10个记录
-    blog_ids = connect.lrange(history_key, 0, 9)
-    all_blogs = []
-    for blog_id in blog_ids:
-        blogs = Article.objects.get(id=blog_id)
-        all_blogs.append(blogs)
+    # 尝试从缓存中获取数据
+    content = cache.get('history_data')
+    print('从缓存获取的数据')
+    if content is None:
+        print('从数据库中获取的数据')
+        u_id = request.session.get('id', '')
+        user = User.objects.get(id=u_id)
+        connect = get_redis_connection('default')
+        history_key = 'history_%d'%(u_id)
+        # 获取最新的10个记录
+        blog_ids = connect.lrange(history_key, 0, 9)
+        all_blogs = []
+        for blog_id in blog_ids:
+            blogs = Article.objects.get(id=blog_id)
+            all_blogs.append(blogs)
 
-    content = {
-        'all_blogs': all_blogs,
-        'user': user
-    }
+        content = {
+            'all_blogs': all_blogs,
+            'user': user
+        }
 
+        # 设置缓存
+        cache.set('history_data', content, 60*60)
     return render(request, 'blog/history.html', content)
 
 
@@ -255,6 +276,8 @@ def getHistory(request):
 def del_history(request, blog_id):
     u_id = request.session.get('id', '')
     user = User.objects.get(id=u_id)
+    # 清除缓存
+    cache.delete('history_data')
     connect = get_redis_connection('default')
     history_key = 'history_%d' % (u_id)
     # 删除记录
