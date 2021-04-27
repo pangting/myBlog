@@ -63,7 +63,9 @@ def check_user(func):
             args[0].session['path'] = args[0].path
             return redirect(reverse('account:login'))
         return func(*args, **kwargs)
+
     return inner
+
 
 @check_user
 def login_success(request):
@@ -156,8 +158,6 @@ def reset(request):
         return render(request, 'account/reset.html')
 
 
-
-
 # 更改用户信息
 def profile_edit(request, u_id):
     user = User.objects.get(id=u_id)
@@ -181,6 +181,7 @@ def profile_edit(request, u_id):
         }
         return render(request, 'account/profile_edit.html', content)
 
+
 # 上传头像
 def upload(request, u_id):
     user = User.objects.get(id=u_id)
@@ -196,6 +197,7 @@ def upload(request, u_id):
         return redirect('account:login_success')
     else:
         return render(request, 'account/upload.html', {'user': user})
+
 
 # 将图片修改为圆形
 def setIcon(icon):
@@ -221,6 +223,3 @@ def setIcon(icon):
             if l < r3:
                 pimb[i - (r - r3), j - (r - r3)] = pima[i, j]
     return img_circle
-
-
-

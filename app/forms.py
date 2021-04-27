@@ -2,6 +2,7 @@ from django import forms
 from .models import User
 from blog.models import ArticleComment, Article
 
+
 # 创建评论表单
 class CommentForm(forms.ModelForm):
     class Meta:
@@ -15,9 +16,9 @@ class ArticleForm(forms.ModelForm):
         model = Article
         fields = ['title', 'content']
 
+
 # 上传头像表单
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['nickname', 'icon']
-

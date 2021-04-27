@@ -32,6 +32,7 @@ class User(models.Model):
         self.comment_num -= 1
         self.save(update_fields=['comment_num'])
 
+
 # 收藏表
 class Collect(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='collected_article')
@@ -43,8 +44,7 @@ class Collect(models.Model):
         except:
             return 'not collect'
 
+
 # 管理员用户
 class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email')
-
-

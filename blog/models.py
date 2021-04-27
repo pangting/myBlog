@@ -4,8 +4,8 @@ from django.urls import reverse
 from django.utils.timezone import now
 
 from mptt.models import MPTTModel, TreeForeignKey
-# Create your models here.
 
+# Create your models here.
 
 
 # 文章评论
@@ -34,6 +34,7 @@ class ArticleComment(models.Model):
     list_display = ('article', 'body')
 '''
 
+
 # 多级评论
 class ArticleComment(MPTTModel):
     body = models.TextField()
@@ -61,7 +62,6 @@ class ArticleComment(MPTTModel):
         db_table = "comment"  # 数据库表名
 
     list_display = ('article', 'body')
-
 
 
 # 博客文章标签
@@ -106,13 +106,12 @@ class Article(models.Model):
     status = models.CharField(verbose_name='状态', max_length=1, choices=STATUS_CHOICES, default='p')
     views = models.PositiveIntegerField(verbose_name='浏览量', default=0)
     created_time = models.DateTimeField(verbose_name='创建时间', default=now)
-    category = models.ForeignKey(Category, verbose_name='分类', on_delete=models.CASCADE, related_name='article_category', blank=False, null=False)
+    category = models.ForeignKey(Category, verbose_name='分类', on_delete=models.CASCADE, related_name='article_category',
+                                 blank=False, null=False)
     tags = models.ManyToManyField(Tag, verbose_name='标签集合', blank=True)
     author = models.ForeignKey('app.User', on_delete=models.CASCADE, default=2)
     user_collect = models.ManyToManyField('app.User', related_name='user_collected')
     collect_nums = models.PositiveIntegerField(verbose_name='收藏数', default=0)
-
-
 
     # 使对象在后台显示更友好
     def __str__(self):
@@ -123,10 +122,11 @@ class Article(models.Model):
         self.collect_nums += 1
         self.save(update_fields=['collect_nums'])
 
-    #减少收藏数
+    # 减少收藏数
     def nums_del(self):
         self.collect_nums -= 1
         self.save(update_fields=['collect_nums'])
+
     # 更新浏览量
     def viewed(self):
         self.views += 1

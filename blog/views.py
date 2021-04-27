@@ -17,7 +17,6 @@ from app.forms import CommentForm, ArticleForm
 # Create your views here.
 
 
-
 # 进入博客首页
 # @cache_page(60*15)
 def start_now(request):
@@ -34,7 +33,8 @@ def start_now(request):
     if state:
         u_id = request.session.get('id', '')
         user = User.objects.get(id=u_id)
-        return render(request, 'blog/blog_index.html', {"blogs": result, 'state':state, 'user': user, 'action': action})
+        return render(request, 'blog/blog_index.html',
+                      {"blogs": result, 'state': state, 'user': user, 'action': action})
     else:
         return render(request, 'blog/blog_index.html', {"blogs": result, 'state': state, 'action': action})
 
@@ -50,7 +50,7 @@ def blog_detail(request, blog_id):
 
     # 添加浏览记录
     connect = get_redis_connection('default')
-    history_key = 'history_%d'%(u_id)
+    history_key = 'history_%d' % (u_id)
     # 移除相同的记录
     connect.lrem(history_key, 0, blog_id)
     # 从左侧添加记录
@@ -79,6 +79,7 @@ def blog_detail(request, blog_id):
         'has_fav': has_fav,
     }
     return render(request, 'blog/blog_detail.html', context=context)
+
 
 '''
 # 一级评论
@@ -116,6 +117,8 @@ def article_comment(request, post_id):
 
         return redirect(article)  # 返回详情页
 '''
+
+
 # 多级评论
 @check_user
 # @xframe_options_exempt  # 无限制
@@ -166,7 +169,6 @@ def article_comment(request, post_id, parent_comment_id=None):
         # return HttpResponse('回复界面')
 
 
-
 # 发表博客
 @check_user
 def article_post(request):
@@ -192,7 +194,8 @@ def article_post(request):
         # print(cate)
         article_categorys = Category.objects.all()
         print('=======', article_categorys)
-        return render(request, 'blog/article_post.html', {'article_post_form': article_post_form, 'article_categorys': article_categorys, 'user': user})
+        return render(request, 'blog/article_post.html',
+                      {'article_post_form': article_post_form, 'article_categorys': article_categorys, 'user': user})
 
 
 # 我的博客列表
@@ -209,6 +212,7 @@ def my_article(request, u_id):
     else:
         return render(request, 'blog/other_article.html', {'article_list': article_list, 'user': user})
 
+
 # 我的博客中的文章详情
 @check_user
 def my_blog_detail(request, blog_id):
@@ -224,6 +228,7 @@ def my_blog_detail(request, blog_id):
     }
     return render(request, 'blog/my_blog_detailed.html', context=context)
 
+
 # 删除博客
 @check_user
 def delete_article(request, a_id):
@@ -237,10 +242,12 @@ def delete_article(request, a_id):
 def search(request):
     q = request.GET.get('q', '')
     content = Article.objects.all()
-    search_list = Article.objects.filter(Q(title__contains=q) | Q(author__username__contains=q) | Q(content__contains=q))
+    search_list = Article.objects.filter(
+        Q(title__contains=q) | Q(author__username__contains=q) | Q(content__contains=q))
     print(search_list)
     msg = '没有结果'
     return render(request, 'blog/search.html', {'content': content, 'search_list': search_list, 'msg': msg})
+
 
 # 获取浏览记录
 @check_user
@@ -253,7 +260,7 @@ def getHistory(request):
         u_id = request.session.get('id', '')
         user = User.objects.get(id=u_id)
         connect = get_redis_connection('default')
-        history_key = 'history_%d'%(u_id)
+        history_key = 'history_%d' % (u_id)
         # 获取最新的10个记录
         blog_ids = connect.lrange(history_key, 0, 9)
         all_blogs = []
@@ -267,7 +274,7 @@ def getHistory(request):
         }
 
         # 设置缓存
-        cache.set('history_data', content, 60*60)
+        cache.set('history_data', content, 60 * 60)
     return render(request, 'blog/history.html', content)
 
 
@@ -284,8 +291,6 @@ def del_history(request, blog_id):
     connect.lrem(history_key, 0, blog_id)
 
     return redirect('blog:history')
-
-
 
 
 # 添加/取消 收藏
@@ -335,6 +340,7 @@ def my_collect(request):
     else:
         return HttpResponse('还没有任何收藏哦')
 
+
 # 我的收藏中  取消收藏
 @check_user
 def cancelCol(request, blog_id):
@@ -343,4 +349,3 @@ def cancelCol(request, blog_id):
     col = Collect.objects.filter(user=user, article_id=blog_id)
     col.delete()
     return redirect('blog:my_collect')
-

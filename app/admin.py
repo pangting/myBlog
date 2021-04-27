@@ -1,6 +1,7 @@
 from django.contrib import admin
 from app.models import User
 from blog.models import Article, ArticleComment, Category, Tag
+
 # Register your models here.
 
 # 添加自定义模型到admin管理界面

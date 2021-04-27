@@ -10,7 +10,8 @@ urlpatterns = [
     # url正向解析
     url(r'^blog_detail/(?P<blog_id>\d+)/$', views.blog_detail, name='blog_detail'),
     url(r'^blog_detail/comment/(?P<post_id>\d+)/$', views.article_comment, name='article_comment'),
-    url(r'^blog_detail/comment/(?P<post_id>\d+)/(?P<parent_comment_id>\d+)/$', views.article_comment, name='comment_reply'),
+    url(r'^blog_detail/comment/(?P<post_id>\d+)/(?P<parent_comment_id>\d+)/$', views.article_comment,
+        name='comment_reply'),
     url(r'^article_post/$', views.article_post, name='article_post'),
     url(r'^my_article/(?P<u_id>\d+)/', views.my_article, name='my_article'),
     url(r'^my_blog_detail/(?P<blog_id>\d+)/$', views.my_blog_detail, name='my_blog_detail'),

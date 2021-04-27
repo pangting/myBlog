@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = '1$y3#hl^b-u+#&6rxs=ur0isd+0+wytzhgddm#2^&3whck!)p('
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -73,7 +71,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'MyBlog.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
@@ -81,13 +78,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'MyBlog',
-        'USER':'root',
-        'PASSWORD':'961008',
-        'HOST':'localhost',
-        'PORT':'3306',
+        'USER': 'root',
+        'PASSWORD': 'xxxxxx',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -107,7 +103,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -121,7 +116,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
@@ -129,8 +123,8 @@ STATIC_URL = '/static/'
 
 # 配置静态文件目录
 STATICFILES_DIRS = [
-        os.path.join(BASE_DIR, 'app/static'),
-    ]
+    os.path.join(BASE_DIR, 'app/static'),
+]
 
 # 媒体文件地址
 # MEDIA_URL = '/media/'

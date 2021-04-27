@@ -2,7 +2,6 @@ from app import views
 from django.conf.urls import url
 from django.urls import path
 
-
 app_name = 'account'
 urlpatterns = [
     url(r'^$', views.index, name='index'),
@@ -15,6 +14,5 @@ urlpatterns = [
 
     url(r'^profile_edit/(?P<u_id>\d+)/$', views.profile_edit, name='profile_edit'),
     url(r'^upload/(?P<u_id>\d+)/$', views.upload, name='upload'),
-
 
 ]
